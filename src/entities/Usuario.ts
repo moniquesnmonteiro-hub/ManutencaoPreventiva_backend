@@ -7,6 +7,7 @@ import {
 } from "typeorm";
 import { PlanoManutencao } from "./PlanoManutencao";
 import { ExecucaoManutencao } from "./ExecucaoManutencao";
+import { Perfil } from "../types/Perfil";
 
 @Entity("usuarios")
 export class Usuario {
@@ -34,10 +35,11 @@ export class Usuario {
   senha: string; 
 
   @Column({ 
-    type: "varchar", 
-    nullable: false 
+    type: "enum", 
+    enum: ["TECNICO", "SUPERVISOR", "GESTOR"], 
+    default: "TECNICO" 
   })
-  cargo: string; // 'Tecnico', 'Supervisor' ou 'Gestor'
+  perfil: Perfil;
 
   @Column({ 
     type: "boolean", 
@@ -49,8 +51,8 @@ export class Usuario {
   criado_em: Date; 
 
   @OneToMany(() => PlanoManutencao, (plano) => plano.tecnico)
-  planos_padrao: PlanoManutencao[];
+  planos_padrao!: PlanoManutencao[];
 
   @OneToMany(() => ExecucaoManutencao, (exec) => exec.tecnico)
-  execucoes_realizadas: ExecucaoManutencao[];
+  execucoes_realizadas!: ExecucaoManutencao[];
 }
