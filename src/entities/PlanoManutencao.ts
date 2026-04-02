@@ -6,44 +6,45 @@ import {
   JoinColumn, 
   OneToMany 
 } from "typeorm";
-import { Equipamento } from "./Equipamento";
-import { ExecucaoManutencao } from "./ExecucaoManutencao";
-import { Usuario } from "./Usuario";
+import { Equipamento } from "./Equipamento.js";
+import { ExecucaoManutencao } from "./ExecucaoManutencao.js";
+import { Usuario } from "./Usuario.js";
 
 @Entity("planos_manutencao")
 export class PlanoManutencao {
-  @PrimaryGeneratedColumn()
-  id: number;
+  
+  @PrimaryGeneratedColumn("uuid")
+  id!: string;
 
-  @Column()
-  equipamento_id: number;
+  @Column({ type: "uuid" })
+  equipamento_id!: string;
 
-  @ManyToOne(() => Equipamento, (equipamento) => equipamento.planos)
+  @ManyToOne(() => Equipamento, (equipamento: Equipamento) => equipamento.planos)
   @JoinColumn({ name: "equipamento_id" })
-  equipamento: Equipamento;
+  equipamento!: Equipamento;
 
-  @Column()
-  titulo: string; // Ex: Lubrificação Geral [cite: 40]
+  @Column({ type: "varchar", nullable: false })
+  titulo!: string; 
 
   @Column({ type: "text", nullable: true })
-  descricao: string; // Instruções detalhadas [cite: 40]
+  descricao?: string; 
 
-  @Column()
-  periodicidade_days: number; // Intervalo em dias entre execuções [cite: 40]
+  @Column({ type: "int", nullable: false })
+  periodicidade_days!: number; 
 
-  @Column()
-  tecnico_id: number; // Técnico responsável padrão [cite: 40]
+  @Column({ type: "uuid" })
+  tecnico_id!: string; 
 
-  @ManyToOne(() => Usuario, (usuario) => usuario.planos_padrao)
+  @ManyToOne(() => Usuario, (usuario: Usuario) => usuario.planos_padrao)
   @JoinColumn({ name: "tecnico_id" })
-  tecnico: Usuario;
+  tecnico!: Usuario;
 
-  @Column({ type: "date" })
-  proxima_em: Date; // Data calculada para a próxima execução [cite: 40]
+  @Column({ type: "date", nullable: false })
+  proxima_em!: Date; 
 
-  @Column({ default: true })
-  ativo: boolean; // Planos inativos não aparecem no calendário [cite: 40]
+  @Column({ type: "boolean", default: true })
+  ativo!: boolean; 
 
-  @OneToMany(() => ExecucaoManutencao, (execucao) => execucao.plano)
-  execucoes: ExecucaoManutencao[];
+  @OneToMany(() => ExecucaoManutencao, (execucao: ExecucaoManutencao) => execucao.plano)
+  execucoes!: ExecucaoManutencao[];
 }

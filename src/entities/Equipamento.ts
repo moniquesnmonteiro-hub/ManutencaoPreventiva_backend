@@ -1,32 +1,35 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { PlanoManutencao } from "./PlanoManutencao";
+import { PlanoManutencao } from "./PlanoManutencao.js";
 
 @Entity("equipamentos")
 export class Equipamento {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("uuid")
   id: number;
 
-  @Column({ unique: true })
-  codigo: string;
+  @Column({ type: "varchar", unique: true, nullable: false })
+  codigo!: string;
 
-  @Column()
-  nome: string;
+  @Column({type: "varchar", nullable: false})
+  nome!: string;
 
-  @Column()
-  tipo: string;
+  @Column({type: "varchar", nullable: false})
+  tipo!: string;
 
-  @Column()
-  localizacao: string; 
+  @Column({type: "varchar", nullable: false})
+  localizacao!: string; 
 
-  @Column({ nullable: true })
-  fabricante: string;
+  @Column({type: "varchar", nullable: true })
+  fabricante?: string;
 
-  @Column({ nullable: true })
-  modelo: string;
+  @Column({ type: "varchar", nullable: true })
+  modelo?: string;
 
-  @Column({ default: true })
-  ativo: boolean;
+  @Column({type: "boolean", default: true })
+  ativo!: boolean;
+
+  @Column({ type: "timestamptz" })
+  criado_em!: Date;
 
   @OneToMany(() => PlanoManutencao, (plano) => plano.equipamento)
-  planos: PlanoManutencao[];
+  planos!: PlanoManutencao[];
 }

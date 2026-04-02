@@ -6,43 +6,45 @@ import {
   JoinColumn, 
   CreateDateColumn 
 } from "typeorm";
-import { PlanoManutencao } from "./PlanoManutencao";
-import { Usuario } from "./Usuario";
+import { PlanoManutencao } from "./PlanoManutencao.js";
+import { Usuario } from "./Usuario.js";
 
 @Entity("execucoes_manutencao")
 export class ExecucaoManutencao {
-  @PrimaryGeneratedColumn()
-  id: number;
+  
+  @PrimaryGeneratedColumn("uuid")
+  id!: string;
 
-  @Column()
-  plano_id: number;
+  @Column({ type: "uuid" })
+  plano_id!: string;
 
   @ManyToOne(() => PlanoManutencao, (plano) => plano.execucoes)
   @JoinColumn({ name: "plano_id" })
-  plano: PlanoManutencao;
+  plano!: PlanoManutencao;
 
-  @Column()
-  tecnico_id: number; 
+  @Column({ type: "uuid" })
+  tecnico_id!: string; 
 
   @ManyToOne(() => Usuario, (usuario) => usuario.execucoes_realizadas)
   @JoinColumn({ name: "tecnico_id" })
-  tecnico: Usuario;
+  tecnico!: Usuario;
 
-  @Column({ type: "date" })
-  data_execucao: Date; 
+  @Column({ type: "date", nullable: false })
+  data_execucao!: Date; 
 
   @Column({ 
     type: "enum", 
-    enum: ["realizada", "parcial", "nao_realizada"] 
+    enum: ["realizada", "parcial", "nao_realizada"],
+    default: "realizada"
   })
-  status: string;
+  status!: string;
 
-  @Column()
-  conformidade: boolean; 
+  @Column({ type: "boolean", default: true })
+  conformidade!: boolean; 
 
   @Column({ type: "text", nullable: true })
-  observacoes: string; 
+  observacoes?: string; 
 
   @CreateDateColumn({ type: "timestamptz" })
-  timestamp: Date; 
+  timestamp!: Date; 
 }

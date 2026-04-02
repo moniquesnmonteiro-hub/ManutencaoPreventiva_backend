@@ -1,20 +1,21 @@
 import { hash } from "bcrypt";
-import { appDataSource } from "../database/appDataSource";
-import { Usuario } from "../entities/Usuario";
-import { AppError } from "../errors/AppError";
+import { appDataSource } from "../database/appDataSource.js"; 
+import { Usuario } from "../entities/Usuario.js";
+import { AppError } from "../errors/AppError.js";
+import { Perfil } from "../types/Perfil.js";
 
 interface IUsuarioRequest {
   nome: string;
   email: string;
   senha?: string;
-  cargo: string;
+  perfil: Perfil;
   ativo?: boolean;
 }
 
 export class UsuarioService {
   private repository = appDataSource.getRepository(Usuario);
 
-  async create({ nome, email, senha, cargo }: IUsuarioRequest): Promise<Usuario> {
+  async create({ nome, email, senha, perfil }: IUsuarioRequest): Promise<Usuario> {
     if (!senha) throw new AppError("Senha obrigatória");
 
     const emailExists = await this.repository.findOneBy({ email });
@@ -26,7 +27,7 @@ export class UsuarioService {
       nome,
       email,
       senha: passwordHash,
-      cargo,
+      perfil,
     });
 
     await this.repository.save(usuario);
@@ -50,10 +51,10 @@ export class UsuarioService {
   async update(id: number, data: Partial<IUsuarioRequest>): Promise<Usuario> {
     const usuario = await this.listOne(id);
 
-    if (data.cargo) {
-      const roles = ["Tecnico", "Supervisor", "Gestor"];
-      if (!roles.includes(data.cargo)) {
-        throw new AppError("Cargo inválido");
+    if (data.perfil) {
+      const roles = [Perfil.TECNICO, Perfil.SUPERVISOR, Perfil.GESTOR];
+      if (!roles.includes(data.perfil)) {
+        throw new AppError("Perfil inválido");
       }
     }
 
