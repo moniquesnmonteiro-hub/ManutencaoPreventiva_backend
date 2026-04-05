@@ -9,7 +9,7 @@ export const createUserSchema = z.object({
     
     email: z.string().email(),
     
-    password: z.string()
+    senha: z.string()
         .min(6)
         .refine((s) => /[A-Z]/.test(s), { 
             message: "Deve conter ao menos 1 letra maiúscula" 
@@ -25,7 +25,7 @@ export const createUserSchema = z.object({
 });
 
 export const updateUserSchema = createUserSchema
-    .omit({ password: true })
+    .omit({ senha: true })
     .partial();
 
 export type CreateUserSchemaDTO = z.infer<typeof createUserSchema>;

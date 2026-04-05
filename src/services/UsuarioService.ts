@@ -26,7 +26,7 @@ export class UsuarioService {
     const usuario = this.repository.create({
       nome,
       email,
-      senha: passwordHash,
+      senha_hash: passwordHash,
       perfil,
     });
 
