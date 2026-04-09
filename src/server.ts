@@ -5,12 +5,14 @@ import usuarioRoutes from "./routes/usuarioRoutes.js";
 import { appDataSource } from "./database/appDataSource.js";
 import equipamentoRoutes from "./routes/equipamentoRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import planoRoutes from "./routes/planoRoutes.js";
 
 
 const app = express();
 app.use(express.json());
 app.use("/api/usuarios", usuarioRoutes);
 app.use("/api/equipamentos", equipamentoRoutes);
+app.use("/api/planos", planoRoutes);
 app.use (errorHandler);
 
 appDataSource.initialize()

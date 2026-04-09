@@ -23,7 +23,7 @@ export class EquipamentoService {
   }
 
   async listOne(id: string): Promise<Equipamento> {
-    // Busca o equipamento e inclui os planos vinculados conforme o PRD [cite: 74]
+
     const equipamento = await this.repository.findOne({
       where: { id: id as any },
       relations: ["planos"]
@@ -45,7 +45,7 @@ export class EquipamentoService {
 
   async delete(id: string): Promise<void> {
     const equipamento = await this.listOne(id);
-    equipamento.ativo = false; // Exclusão lógica conforme guideline [cite: 36]
+    equipamento.ativo = false;
     await this.repository.save(equipamento);
   }
 }

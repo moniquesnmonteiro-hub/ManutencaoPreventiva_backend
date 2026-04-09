@@ -9,6 +9,7 @@ import {
 import { Equipamento } from "./Equipamento.js";
 import { ExecucaoManutencao } from "./ExecucaoManutencao.js";
 import { Usuario } from "./Usuario.js";
+import { tr } from "zod/locales";
 
 @Entity("planos_manutencao")
 export class PlanoManutencao {
@@ -32,7 +33,7 @@ export class PlanoManutencao {
   @Column({ type: "int", nullable: false })
   periodicidade_days!: number; 
 
-  @Column({ type: "uuid" })
+  @Column({ type: "uuid", nullable: true })
   tecnico_id!: string; 
 
   @ManyToOne(() => Usuario, (usuario: Usuario) => usuario.planos_padrao)
