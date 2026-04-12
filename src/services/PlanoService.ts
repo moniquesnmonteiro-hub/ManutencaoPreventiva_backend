@@ -33,6 +33,10 @@ export class PlanoService {
         return await this.planoRepository.save(plano);
     }
 
+async listAll(): Promise<PlanoManutencao[]> {
+    return await this.planoRepository.find({ relations: ["equipamento"] });
+}
+
     async listByEquipamento(equipamento_id: string): Promise<PlanoManutencao[]> {
         return await this.planoRepository.find({
             where: { equipamento: { id: equipamento_id as any } },

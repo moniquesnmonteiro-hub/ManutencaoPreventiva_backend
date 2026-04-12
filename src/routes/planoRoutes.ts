@@ -11,6 +11,8 @@ const controller = new PlanoController(service);
 
 router.post("/", validateBody(createPlanoSchema), controller.create.bind(controller));
 
+router.get("/", controller.findAll.bind(controller));
+
 router.get("/equipamento/:id", controller.findByEquipamento.bind(controller));
 
 router.get("/:id", controller.findOne.bind(controller));

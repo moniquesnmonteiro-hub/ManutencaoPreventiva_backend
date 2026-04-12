@@ -11,6 +11,12 @@ export default class PlanoController {
         return res.status(201).json(plano);
     }
 
+    // Listar todos os planos
+    async findAll(req: Request, res: Response) {
+        const planos = await this.service.listAll();
+        return res.status(200).json(planos);
+    }
+
     // Listar planos de um equipamento específico
     async findByEquipamento(req: Request, res: Response) {
         const { id } = req.params;
