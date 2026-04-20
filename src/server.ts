@@ -1,20 +1,19 @@
 import "reflect-metadata";
 import "dotenv/config";
 import express from "express";
-import usuarioRoutes from "./routes/usuarioRoutes.js";
+import cors from "cors";
 import { appDataSource } from "./database/appDataSource.js";
-import equipamentoRoutes from "./routes/equipamentoRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
-import planoRoutes from "./routes/planoRoutes.js";
-import execucaoRoutes from "./routes/execucaoRoutes.js";
+import routes from "./routes/index.js";
 
 
 const app = express();
+
+app.use(cors());
 app.use(express.json());
-app.use("/api/usuarios", usuarioRoutes);
-app.use("/api/equipamentos", equipamentoRoutes);
-app.use("/api/planos", planoRoutes);
-app.use("/api/execucoes", execucaoRoutes);
+
+app.use("/api", routes);
+
 app.use (errorHandler);
 
 appDataSource.initialize()

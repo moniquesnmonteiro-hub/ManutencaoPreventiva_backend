@@ -7,7 +7,7 @@ export const createUserSchema = z.object({
         .min(1)
         .max(100),
     
-    email: z.string().email(),
+    email: z.email(),
     
     senha: z.string()
         .min(6)
