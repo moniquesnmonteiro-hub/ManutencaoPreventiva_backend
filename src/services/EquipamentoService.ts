@@ -23,7 +23,6 @@ export class EquipamentoService {
   }
 
   async listOne(id: string): Promise<Equipamento> {
-
     const equipamento = await this.repository.findOne({
       where: { id: id as any },
       relations: ["planos"]
