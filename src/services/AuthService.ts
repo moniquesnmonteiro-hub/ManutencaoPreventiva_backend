@@ -38,10 +38,10 @@ export class AuthService {
     async login(email: string, senha: string, meta?: { ip?: string; userAgent?: string }) {
         const usuario = await this.userRepo.findOne({
             where: { email },
-            select: ["id", "nome", "email", "senha_hash", "perfil"]
+            select: ["id", "nome", "email", "senha_hash", "perfil", "ativo"]
         });
 
-        if (!usuario || !(await compare(senha, usuario.senha_hash))) {
+        if (!usuario || !usuario.ativo || !(await compare(senha, usuario.senha_hash))) {
             throw new AppError("E-mail ou senha inválidos", 401);
         }
 
@@ -61,7 +61,8 @@ export class AuthService {
         await this.sessionRepo.save(sessao);
 
         const accessToken = this.gerarAccessToken(usuario);
-        return { accessToken, refreshToken, usuario };
+        const { senha_hash, ...usuarioRetorno } = usuario;
+        return { accessToken, refreshToken, usuario: usuarioRetorno };
     }
 
     async refresh(refreshToken: string) {
