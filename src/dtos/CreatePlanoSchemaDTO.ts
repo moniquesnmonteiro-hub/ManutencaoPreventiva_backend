@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const createPlanoSchema = z.object({
-    equipamento_id: z.coerce.number().int().positive({ message: "Equipamento inválido" }),
+    equipamento_id: z.string().uuid({ message: "Equipamento inválido" }),
 
     descricao: z.string()
         .trim()
