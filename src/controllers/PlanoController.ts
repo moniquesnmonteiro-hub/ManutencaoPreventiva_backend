@@ -39,6 +39,14 @@ export default class PlanoController {
         return res.status(200).json(plano);
     }
 
+    // Atribuir técnico responsável padrão a um plano.
+    async atribuirTecnico(req: Request, res: Response) {
+        const { id } = req.params;
+        const { tecnico_id } = req.body;
+        const plano = await this.service.atribuirTecnico(id as string, tecnico_id ?? null);
+        return res.status(200).json(plano);
+    }
+
     // Deletar (Desativar) um plano
     async delete(req: Request, res: Response) {
         const { id } = req.params;

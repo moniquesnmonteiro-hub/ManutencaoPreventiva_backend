@@ -74,6 +74,13 @@ async listAll(): Promise<PlanoManutencao[]> {
         return await this.planoRepository.save(plano);
     }
 
+    async atribuirTecnico(planoId: string, tecnicoId: number | null): Promise<PlanoManutencao> {
+        const plano = await this.findById(planoId);
+        // Atualiza apenas o técnico responsável padrão do plano.
+        plano.tecnico_id = tecnicoId as any;
+        return await this.planoRepository.save(plano);
+    }
+
     async delete(id: string): Promise<void> {
         const plano = await this.findById(id);
         plano.ativo = false;

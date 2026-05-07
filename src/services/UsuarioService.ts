@@ -34,7 +34,16 @@ export class UsuarioService {
     return usuario;
   }
 
-  async listAll(): Promise<Usuario[]> {
+  async listAll(search?: string): Promise<Usuario[]> {
+    if (search) {
+      // Filtra técnicos ativos cujo nome contenha o termo buscado (case-insensitive).
+      return await this.repository
+        .createQueryBuilder('usuario')
+        .where('LOWER(usuario.nome) LIKE LOWER(:search)', { search: `%${search}%` })
+        .andWhere('usuario.ativo = true')
+        .select(['usuario.id', 'usuario.nome', 'usuario.perfil'])
+        .getMany();
+    }
     return await this.repository.find();
   }
 

@@ -9,9 +9,10 @@ export default class UsuarioController {
         this.userService = userService;
     }
 
-    async findAllUsers(_req: Request, res: Response) {
-
-        const users = await this.userService.listAll();
+    async findAllUsers(req: Request, res: Response) {
+        // Aceita ?search=nome para busca de técnicos pelo nome.
+        const search = req.query.search as string | undefined;
+        const users = await this.userService.listAll(search);
         return res.status(200).json(users);
     }
 

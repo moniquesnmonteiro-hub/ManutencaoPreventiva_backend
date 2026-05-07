@@ -19,6 +19,8 @@ router.get("/:id", controller.findOne.bind(controller));
 
 router.put("/:id", validateBody(updatePlanoSchema), controller.update.bind(controller));
 
+router.patch("/:id/tecnico", controller.atribuirTecnico.bind(controller));
+
 router.delete("/:id", controller.delete.bind(controller));
 
 export default router;
