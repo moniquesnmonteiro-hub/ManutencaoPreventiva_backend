@@ -7,55 +7,79 @@ import { LessThan, Between } from "typeorm";
 export class DashboardController {
     async getSummary(req: Request, res: Response) {
         try {
-            const planoRepository = appDataSource.getRepository(PlanoManutencao);
-            const execRepository = appDataSource.getRepository(ExecucaoManutencao);
+            const planoRepo = appDataSource.getRepository(PlanoManutencao);
+            const execRepo = appDataSource.getRepository(ExecucaoManutencao);
 
+            // Data de hoje sem horário para comparar com coluna date.
             const hoje = new Date();
-            
-            // Início e fim do mês atual para os indicadores mensais
+            hoje.setHours(0, 0, 0, 0);
+
+            // Intervalo do mês atual.
             const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
-            const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+            const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0, 23, 59, 59);
 
-            // 1. Manutenções Atrasadas
-            const atrasados = await planoRepository.count({
-                where: {
-                    proxima_em: LessThan(hoje)
-                }
+            // Data limite de 7 dias a partir de hoje.
+            const seteDias = new Date(hoje);
+            seteDias.setDate(hoje.getDate() + 7);
+
+            // Conta planos ativos com proxima_em anterior a hoje.
+            const atrasadas = await planoRepo.count({
+                where: { proxima_em: LessThan(hoje), ativo: true }
             });
 
-            // 2. Total de Execuções no Mês Atual
-            const execucoesMes = await execRepository.count({
-                where: {
-                    data_execucao: Between(inicioMes, fimMes)
-                }
+            // Conta planos ativos previstos para os próximos 7 dias.
+            const proximasSeteDias = await planoRepo.count({
+                where: { proxima_em: Between(hoje, seteDias), ativo: true }
             });
 
-            // 3. Manutenções Previstas para os próximos 7 dias
-            const seteDiasDepois = new Date();
-            seteDiasDepois.setDate(hoje.getDate() + 7);
-            
-            const proximas = await planoRepository.count({
-                where: {
-                    proxima_em: Between(hoje, seteDiasDepois)
-                }
+            // Conta todas as execuções registradas no mês atual.
+            const totalExecucoesMes = await execRepo.count({
+                where: { data_execucao: Between(inicioMes, fimMes) }
             });
 
-            // 4. Lista das 5 manutenções mais atrasadas (Para o widget de alerta)
-            const listaAtrasados = await planoRepository.find({
-                where: { proxima_em: LessThan(hoje) },
+            // Conta execuções conformes no mês
+            const conformesMes = await execRepo.count({
+                where: { data_execucao: Between(inicioMes, fimMes), conformidade: true }
+            });
+
+            // Percentual de conformidade do mês (0 se não houver execuções).
+            const conformidadeMes = totalExecucoesMes > 0
+                ? Math.round((conformesMes / totalExecucoesMes) * 100)
+                : 0;
+
+            // Todos os planos atrasados ordenados pelo mais antigo, com equipamento.
+            const planosAtrasados = await planoRepo.find({
+                where: { proxima_em: LessThan(hoje), ativo: true },
                 relations: ["equipamento"],
-                order: { proxima_em: "ASC" },
-                take: 5
+                order: { proxima_em: "ASC" }
+            });
+
+            // Calcula dias de atraso para cada plano.
+            const alertas = planosAtrasados.map(plano => {
+                const proxima = new Date(plano.proxima_em);
+                proxima.setHours(0, 0, 0, 0);
+                const diasAtraso = Math.floor(
+                    (hoje.getTime() - proxima.getTime()) / 86_400_000
+                );
+                return {
+                    id: plano.id,
+                    titulo: plano.titulo,
+                    proxima_em: plano.proxima_em,
+                    diasAtraso,
+                    equipamento: plano.equipamento
+                        ? { nome: plano.equipamento.nome, codigo: plano.equipamento.codigo }
+                        : null
+                };
             });
 
             return res.json({
                 indicadores: {
-                    atrasadas: atrasados,
-                    realizadasNoMes: execucoesMes,
-                    proximasSeteDias: proximas,
-                    conformidadeMes: 100 // Valor fixo para V1
+                    atrasadas,
+                    proximasSeteDias,
+                    realizadasNoMes: totalExecucoesMes,
+                    conformidadeMes
                 },
-                alertas: listaAtrasados
+                alertas
             });
 
         } catch (error) {
