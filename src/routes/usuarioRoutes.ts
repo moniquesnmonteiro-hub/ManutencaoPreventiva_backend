@@ -3,6 +3,7 @@ import UsuarioController from "../controllers/UsuarioController.js";
 import { UsuarioService } from "../services/UsuarioService.js";
 import { validateBody } from "../middleware/validateBody.js";
 import { createUserSchema, updateUserSchema, updateMeSchema } from "../dtos/CreateUserSchemaDTO.js";
+import { requireGestor } from "../middleware/requireGestor.js";
 
 const router = Router();
 const usuarioService = new UsuarioService(); 
@@ -14,7 +15,7 @@ router.get("/", usuarioController.findAllUsers.bind(usuarioController));
 
 router.get("/:id", usuarioController.findUserById.bind(usuarioController));
 
-router.post("/", validateBody(createUserSchema), usuarioController.createUser.bind(usuarioController));
+router.post("/", requireGestor, validateBody(createUserSchema), usuarioController.createUser.bind(usuarioController));
 
 router.put("/:id", validateBody(updateUserSchema), usuarioController.updateUser.bind(usuarioController));
 

@@ -18,6 +18,11 @@ export class UsuarioService {
   async create({ nome, email, senha, perfil }: IUsuarioRequest): Promise<Usuario> {
     if (!senha) throw new AppError("Senha obrigatória");
 
+    // Gestores não podem ser criados por este endpoint.
+    if (perfil === Perfil.GESTOR || (perfil as any) === "GESTOR") {
+      throw new AppError("Não é permitido cadastrar usuários com perfil Gestor", 403);
+    }
+
     const emailExists = await this.repository.findOneBy({ email });
     if (emailExists) throw new AppError("E-mail já cadastrado");
 
