@@ -1,4 +1,4 @@
-import { hash } from "bcrypt";
+import { hash, compare } from "bcrypt";
 import { appDataSource } from "../database/appDataSource.js"; 
 import { Usuario } from "../entities/Usuario.js";
 import { AppError } from "../errors/AppError.js";
@@ -71,6 +71,30 @@ export class UsuarioService {
 
     await this.repository.save(usuario);
     return usuario;
+  }
+
+  async updateMe(userId: number, nome: string, senhaAtual?: string, novaSenha?: string): Promise<Usuario> {
+    // Busca o usuário incluindo senha_hash (campo select:false).
+    const usuario = await this.repository
+      .createQueryBuilder('usuario')
+      .addSelect('usuario.senha_hash')
+      .where('usuario.id = :id', { id: userId })
+      .getOne();
+
+    if (!usuario) throw new AppError('Usuário não encontrado', 404);
+
+    // Atualiza o nome.
+    usuario.nome = nome;
+
+    // Se nova senha fornecida, valida a senha atual antes de alterar.
+    if (novaSenha) {
+      if (!senhaAtual) throw new AppError('Senha atual obrigatória para alterar a senha', 400);
+      const senhaValida = await compare(senhaAtual, usuario.senha_hash);
+      if (!senhaValida) throw new AppError('Senha atual incorreta', 400);
+      usuario.senha_hash = await hash(novaSenha, 10);
+    }
+
+    return await this.repository.save(usuario);
   }
 
   async delete(id: number): Promise<void> {
