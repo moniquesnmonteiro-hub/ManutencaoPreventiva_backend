@@ -11,7 +11,9 @@ export const createPlanoSchema = z.object({
         .int()
         .positive({ message: "A periodicidade deve ser um número de dias positivo" }),
 
-    data_inicio: z.iso.datetime({ message: "Formato de data inválido. Use o padrão AAAA-MM-DDTHH:mm:ss.sssZ" })
+    data_inicio: z.iso.datetime({ message: "Formato de data inválido. Use o padrão AAAA-MM-DDTHH:mm:ss.sssZ" }),
+
+    tecnico_id: z.coerce.number().int().positive().optional().nullable(),
 });
 
 export type CreatePlanoSchemaDTO = z.infer<typeof createPlanoSchema>;

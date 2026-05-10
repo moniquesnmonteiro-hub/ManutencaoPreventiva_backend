@@ -10,7 +10,7 @@ export class PlanoService {
     private equipRepository = appDataSource.getRepository(Equipamento);
 
     async create(data: CreatePlanoSchemaDTO): Promise<PlanoManutencao> {
-        const { equipamento_id, descricao, periodicidade, data_inicio } = data;
+        const { equipamento_id, descricao, periodicidade, data_inicio, tecnico_id } = data;
 
         const equipamento = await this.equipRepository.findOneBy({ 
             id: equipamento_id as any 
@@ -27,6 +27,7 @@ export class PlanoService {
             descricao: descricao,
             periodicidade_days: periodicidade,
             proxima_em: new Date(data_inicio),
+            tecnico_id: (tecnico_id ?? null) as any,
             ativo: true
         });
 
@@ -34,7 +35,11 @@ export class PlanoService {
     }
 
 async listAll(): Promise<PlanoManutencao[]> {
-    return await this.planoRepository.find({ relations: ["equipamento"] });
+    return await this.planoRepository.find({
+        where: { ativo: true },
+        relations: ["equipamento"],
+        order: { proxima_em: "ASC" },
+    });
 }
 
     async listByEquipamento(equipamento_id: string): Promise<PlanoManutencao[]> {
